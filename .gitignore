@@ -1,0 +1,19 @@
+# Python (Ambiente virtual e arquivos temporários)
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+.env
+
+# React / Node (Pastas pesadas que não vão para o GitHub)
+node_modules/
+dist/
+build/
+.eslintcache
+*.log
+
+# Outros (Arquivos de sistema e do VS Code)
+.DS_Store
+.vscode/
+.idea/
