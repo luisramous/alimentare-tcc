@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import ComoFunciona from "./pages/ComoFunciona";
+import ProdutoDetalhes from "./pages/ProdutoDetalhes"; // 1. Adicionamos esta linha
 
 export default function App() {
   return (
@@ -15,6 +16,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sobre" element={<ComoFunciona />} />
+          {/* 2. Adicionamos a rota dinâmica para os produtos abaixo */}
+          <Route path="/produto/:nome" element={<ProdutoDetalhes />} />
         </Routes>
       </div>
     </Router>

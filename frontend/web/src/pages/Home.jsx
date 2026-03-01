@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Brain, Database, Users, Search, Plus } from "lucide-react";
+import { Link } from "react-router-dom"; // <--- ADICIONE ESTA LINHA
 import BenefitCard from "../components/BenefitCard";
 
 export default function Home() {
@@ -11,12 +12,22 @@ export default function Home() {
     if (!query) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/foods/search?query=${query}`);
+      // Usamos o IP 127.0.0.1 para evitar problemas de rede local
+      const response = await fetch(`http://127.0.0.1:8000/foods/search?query=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) throw new Error("Erro no servidor");
+
       const data = await response.json();
-      setFoods(Array.isArray(data) ? data : []);
+      
+      if (Array.isArray(data) && data.length > 0) {
+        setFoods(data);
+      } else {
+        setFoods([]);
+        alert("Nenhum produto encontrado ou o servidor da API está lento. Tente novamente.");
+      }
     } catch (error) {
-      console.error("Erro:", error);
-      setFoods([]);
+      console.error("Erro na busca:", error);
+      alert("⚠️ Erro de conexão! Verifique se o terminal do Python está aberto.");
     } finally {
       setLoading(false);
     }
@@ -109,7 +120,7 @@ export default function Home() {
               transition: "transform 0.2s"
             }}
           >
-            {loading ? "Buscando" : "Buscar"}
+            {loading ? "Buscando..." : "Buscar"}
           </button>
         </div>
 
@@ -133,91 +144,154 @@ export default function Home() {
         </button>
       </section>
 
-      {/* --- BENEFÍCIOS (Somente se não houver busca) --- */}
+      {/* --- BENEFÍCIOS --- */}
       {foods.length === 0 && !loading && (
-        <section style={{ 
-          display: "flex", 
-          justifyContent: "center", 
-          gap: "32px", 
-          flexWrap: "wrap", 
-          padding: "40px 5% 100px" 
-        }}>
-          <BenefitCard 
-            icon={<Brain color="#2ecc71" size={28} />} 
-            title="IA Avançada" 
-            desc="Análise automatizada de ingredientes e classificação nutricional." 
-          />
-          <BenefitCard 
-            icon={<Database color="#3498db" size={28} />} 
-            title="+2M Produtos" 
-            desc="Base de dados global atualizada diariamente para você." 
-          />
-          <BenefitCard 
-            icon={<Users color="#e67e22" size={28} />} 
-            title="Para Todos" 
-            desc="Interface acessível e informações claras para toda a família." 
-          />
+        <section style={{ display: "flex", justifyContent: "center", gap: "32px", flexWrap: "wrap", padding: "40px 5% 100px" }}>
+          <Link to="/sobre" style={{ textDecoration: 'none' }}>
+            <BenefitCard icon={<Brain color="#2ecc71" size={28} />} title="IA Avançada" desc="Análise automatizada de ingredientes e classificação nutricional." />
+          </Link>
+          <Link to="/sobre" style={{ textDecoration: 'none' }}>
+            <BenefitCard icon={<Database color="#3498db" size={28} />} title="+2M Produtos" desc="Base de dados global atualizada diariamente para você." />
+          </Link>
+          <Link to="/sobre" style={{ textDecoration: 'none' }}>
+            <BenefitCard icon={<Users color="#e67e22" size={28} />} title="Para Todos" desc="Interface acessível e informações claras para toda a família." />
+          </Link>
         </section>
       )}
 
       {/* --- GRID DE RESULTADOS --- */}
-      <section style={{ padding: "0 5% 100px", boxSizing: "border-box" }}>
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", 
-          gap: "32px" 
-        }}>
-          {foods.map((f, i) => (
-            <div key={i} style={{ 
-              backgroundColor: "white", 
-              padding: "24px", 
-              borderRadius: "28px", 
-              boxShadow: "0 20px 40px rgba(0,0,0,0.04)", 
-              textAlign: "center", 
-              position: "relative",
-              border: "1px solid #f8f9fa"
-            }}>
-              <div style={{ 
-                position: "absolute", top: 20, right: 20, 
-                backgroundColor: getNutriColor(f.nutriscore), 
-                color: "white", padding: "6px 14px", borderRadius: "10px", 
-                fontWeight: "800", fontSize: "15px" 
-              }}>
-                {f.nutriscore}
-              </div>
-              
-              <div style={{ height: "180px", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
-                <img 
-                  src={f.imagem || "https://via.placeholder.com/150"} 
-                  alt={f.nome} 
-                  style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} 
-                />
-              </div>
+<section style={{ padding: "0 5% 100px", boxSizing: "border-box" }}>
+  <div style={{ 
+    display: "grid", 
+    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", 
+    gap: "32px" 
+  }}>
+    {foods.map((f, i) => (
+  <Link 
+    to={`/produto/${encodeURIComponent(f.nome)}`} 
+    key={i} 
+    style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+  >
+    <div 
+      style={{ 
+        backgroundColor: "white", 
+        padding: "32px", 
+        borderRadius: "32px", 
+        boxShadow: "0 10px 30px rgba(0,0,0,0.04)", 
+        textAlign: "center", 
+        position: "relative",
+        border: "1px solid #f0f2f5",
+        transition: "all 0.3s ease",
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "column"
+      }}
+      // Efeito de "levitar" o card do produto
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-10px)";
+        e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.08)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.04)";
+      }}
+    >
+      {/* Badge Nutri-Score flutuante com sombra */}
+      <div style={{ 
+        position: "absolute", 
+        top: 20, 
+        right: 20, 
+        backgroundColor: getNutriColor(f.nutriscore), 
+        color: "white", 
+        padding: "8px 16px", 
+        borderRadius: "14px", 
+        fontWeight: "800", 
+        fontSize: "14px",
+        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+        zIndex: 2
+      }}>
+        {f.nutriscore}
+      </div>
+      
+      {/* Moldura da Imagem para destacar o produto */}
+      <div style={{ 
+        height: "200px", 
+        backgroundColor: "#fbfcfd", 
+        borderRadius: "20px",
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        marginBottom: "24px",
+        padding: "15px",
+        overflow: "hidden"
+      }}>
+        <img 
+          src={f.imagem || "https://via.placeholder.com/150?text=Sem+Foto"} 
+          alt={f.nome} 
+          style={{ 
+            maxHeight: "100%", 
+            maxWidth: "100%", 
+            objectFit: "contain",
+            filter: "drop-shadow(0 5px 15px rgba(0,0,0,0.08))" 
+          }} 
+        />
+      </div>
 
-              <h3 style={{ fontSize: "19px", color: "#1a2a3a", fontWeight: "700", margin: "0 0 6px", minHeight: "46px", overflow: "hidden" }}>
-                {f.nome}
-              </h3>
-              <p style={{ color: "#95a5a6", fontSize: "14px", fontWeight: "500", marginBottom: "24px" }}>
-                {f.marca}
-              </p>
-              
-              <button style={{ 
-                width: "100%", 
-                padding: "14px", 
-                borderRadius: "16px", 
-                border: "2px solid #2ecc71", 
-                backgroundColor: "transparent", 
-                color: "#2ecc71", 
-                fontWeight: "700", 
-                cursor: "pointer",
-                transition: "0.2s" 
-              }}>
-                Visualizar Detalhes
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Informações do Texto */}
+      <div style={{ flexGrow: 1 }}>
+        <h3 style={{ 
+          fontSize: "20px", 
+          color: "#1a2a3a", 
+          fontWeight: "700", 
+          margin: "0 0 8px", 
+          minHeight: "48px", 
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden"
+        }}>
+          {f.nome}
+        </h3>
+        <p style={{ 
+          color: "#95a5a6", 
+          fontSize: "15px", 
+          fontWeight: "500", 
+          marginBottom: "24px" 
+        }}>
+          {f.marca}
+        </p>
+      </div>
+      
+      {/* Mudamos de <button> para <div> para o link funcionar corretamente */}
+      <div 
+        style={{ 
+          width: "100%", 
+          padding: "16px", 
+          borderRadius: "18px", 
+          border: "2px solid #2ecc71", 
+          backgroundColor: "transparent", 
+          color: "#2ecc71", 
+          fontWeight: "700", 
+          fontSize: "15px",
+          textAlign: "center",
+          transition: "all 0.2s ease" 
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = "#2ecc71";
+          e.target.style.color = "white";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = "transparent";
+          e.target.style.color = "#2ecc71";
+        }}
+      >
+        Visualizar Detalhes
+      </div>
+    </div>
+  </Link>
+))}
+  </div>
+</section>
     </main>
   );
 }
