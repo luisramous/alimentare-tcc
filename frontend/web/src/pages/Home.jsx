@@ -1,14 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Adicionado useEffect
 import { Brain, Database, Users, Search, Plus } from "lucide-react";
-import { Link } from "react-router-dom"; // <--- ADICIONE ESTA LINHA
 import BenefitCard from "../components/BenefitCard";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Home() {
-  const [query, setQuery] = useState("");
-  const [foods, setFoods] = useState([]);
+  // Inicia tentando recuperar o que estava salvo na memória do navegador
+  const [query, setQuery] = useState(sessionStorage.getItem("ultimaBusca") || "");
+  const [foods, setFoods] = useState(JSON.parse(sessionStorage.getItem("ultimosResultados")) || []);
   const [loading, setLoading] = useState(false);
+  const [showFormManual, setShowFormManual] = useState(false); 
+  const [nomeManual, setNomeManual] = useState("");
+  const [ingredientesManual, setIngredientesManual] = useState("");
+  const [energiaManual, setEnergiaManual] = useState("");
+  const [acucarManual, setAcucarManual] = useState("");
+  const [gorduraManual, setGorduraManual] = useState("");
+  const [sodioManual, setSodioManual] = useState("");
+  const [proteinaManual, setProteinaManual] = useState("");
+  const [fibraManual, setFibraManual] = useState("");
+  const navigate = useNavigate(); // Para poder mudar de página
+  const [imagemManual, setImagemManual] = useState(""); // Novo estado para foto
 
-  const searchFoods = async () => {
+const searchFoods = async () => {
     if (!query) return;
     setLoading(true);
     try {
@@ -21,8 +33,12 @@ export default function Home() {
       
       if (Array.isArray(data) && data.length > 0) {
         setFoods(data);
+        // --- ADICIONADO PARA PERSISTÊNCIA ---
+        sessionStorage.setItem("ultimaBusca", query);
+        sessionStorage.setItem("ultimosResultados", JSON.stringify(data));
+        // ------------------------------------
       } else {
-        setFoods([]);
+        setFoods([]); 
         alert("Nenhum produto encontrado ou o servidor da API está lento. Tente novamente.");
       }
     } catch (error) {
@@ -38,6 +54,50 @@ export default function Home() {
     return colors[score] || "#555";
   };
 
+const cadastrarProdutoManual = async () => {
+    if (!nomeManual || !ingredientesManual) {
+      alert("Preencha o nome e os ingredientes!");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/foods/manual", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: nomeManual,
+          ingredientes: ingredientesManual,
+          imagem: imagemManual, // Enviando a imagem
+          energia_kcal: parseFloat(energiaManual) || 0,
+          acucares_g: parseFloat(acucarManual) || 0,
+          gordura_sat_g: parseFloat(gorduraManual) || 0,
+          sodio_mg: parseFloat(sodioManual) || 0,
+          proteinas_g: parseFloat(proteinaManual) || 0,
+          fibras_g: parseFloat(fibraManual) || 0
+        })
+      });
+
+      if (response.ok) {
+        const dadosDoServidor = await response.json();
+        alert("✅ Produto salvo! Indo para a análise...");
+        
+        // REDIRECIONAMENTO IMEDIATO PARA A PÁGINA DO PRODUTO
+        navigate(`/produto/${encodeURIComponent(nomeManual)}`, { 
+          state: { food: dadosDoServidor.produto_completo } 
+        });
+      }
+    } catch (error) {
+      alert("Erro ao salvar no banco.");
+    }
+  };
+
+  const inputStyle = {
+    width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #e2e8f0", outline: "none", fontSize: "14px", boxSizing: "border-box"
+  };
+
+  const labelNutriStyle = {
+    display: "block", marginBottom: "5px", fontSize: "13px", fontWeight: "600", color: "#64748b"
+  };
   return (
     <main style={{ 
       background: "linear-gradient(to bottom, #f0f9f4 0%, #ffffff 100%)", 
@@ -125,23 +185,99 @@ export default function Home() {
         </div>
 
         {/* BOTÃO CADASTRAR ALIMENTO */}
-        <button style={{ 
-          marginTop: "32px", 
-          background: "white", 
-          border: "1px solid #e0e0e0", 
-          color: "#27ae60", 
-          padding: "12px 28px", 
-          borderRadius: "12px", 
-          display: "inline-flex", 
-          alignItems: "center", 
-          gap: "8px", 
-          fontWeight: "600", 
-          cursor: "pointer",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.03)",
-          transition: "0.2s"
-        }}>
-          <Plus size={18} /> Cadastrar Alimento
+        <button 
+          onClick={() => setShowFormManual(!showFormManual)} 
+          style={{ 
+            marginTop: "32px", 
+            background: showFormManual ? "#f8f9fa" : "white", 
+            border: "1px solid #e0e0e0", 
+            color: showFormManual ? "#e74c3c" : "#27ae60", 
+            padding: "12px 28px", 
+            borderRadius: "12px", 
+            display: "inline-flex", 
+            alignItems: "center", 
+            gap: "8px", 
+            fontWeight: "600", 
+            cursor: "pointer",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.03)",
+            transition: "0.2s"
+          }}
+        >
+          <Plus size={18} style={{ transform: showFormManual ? 'rotate(45deg)' : 'none', transition: '0.3s' }} /> 
+          {showFormManual ? "Cancelar Cadastro" : "Cadastrar Alimento"}
         </button>
+
+        {/* --- FORMULÁRIO DE CADASTRO MANUAL (Com Tabela Nutricional para o TCC) --- */}
+        {showFormManual && (
+          <div style={{ 
+            marginTop: "30px", 
+            maxWidth: "700px", 
+            margin: "30px auto", 
+            padding: "40px", 
+            backgroundColor: "white", 
+            borderRadius: "32px", 
+            boxShadow: "0 20px 50px rgba(0,0,0,0.06)",
+            textAlign: "left",
+            border: "1px solid #f1f3f5"
+          }}>
+            <h3 style={{ color: "#1a2a3a", fontSize: "22px", marginBottom: "8px" }}>Novo Produto Manual</h3>
+            <p style={{ color: "#95a5a6", fontSize: "14px", marginBottom: "25px" }}>
+              Preencha os dados abaixo para que o sistema calcule o Nutri-Score e realize a análise por IA.
+            </p>
+            
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#4b5563" }}>Nome do Alimento</label>
+              <input type="text" placeholder="Ex: Pão de Queijo da Casa" value={nomeManual} onChange={(e) => setNomeManual(e.target.value)} style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#4b5563" }}>Lista de Ingredientes</label>
+              <textarea placeholder="Ex: Polvilho doce, queijo minas, ovos..." value={ingredientesManual} onChange={(e) => setIngredientesManual(e.target.value)} style={{ ...inputStyle, height: "100px", resize: "none" }} />
+            </div>
+
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#4b5563" }}>Link da Imagem (URL)</label>
+              <input type="text" placeholder="Cole o link de uma foto do Google..." value={imagemManual} onChange={(e) => setImagemManual(e.target.value)} style={inputStyle} />
+            </div>
+            
+            {/* --- GRID DA TABELA NUTRICIONAL (Por 100g) --- */}
+            <label style={{ display: "block", marginBottom: "15px", fontWeight: "700", color: "#1a2a3a", borderBottom: "1px solid #eee", paddingBottom: "5px" }}>Tabela Nutricional (por 100g/ml)</label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "30px" }}>
+              <div>
+                <label style={labelNutriStyle}>Energia (kcal)</label>
+                <input type="number" placeholder="0" value={energiaManual} onChange={(e)=>setEnergiaManual(e.target.value)} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelNutriStyle}>Açúcares (g)</label>
+                <input type="number" placeholder="0" value={acucarManual} onChange={(e)=>setAcucarManual(e.target.value)} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelNutriStyle}>Gordura Saturada (g)</label>
+                <input type="number" placeholder="0" value={gorduraManual} onChange={(e)=>setGorduraManual(e.target.value)} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelNutriStyle}>Sódio (mg)</label>
+                <input type="number" placeholder="0" value={sodioManual} onChange={(e)=>setSodioManual(e.target.value)} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelNutriStyle}>Proteínas (g)</label>
+                <input type="number" placeholder="0" value={proteinaManual} onChange={(e)=>setProteinaManual(e.target.value)} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelNutriStyle}>Fibras (g)</label>
+                <input type="number" placeholder="0" value={fibraManual} onChange={(e)=>setFibraManual(e.target.value)} style={inputStyle} />
+              </div>
+            </div>
+
+            <button 
+              onClick={cadastrarProdutoManual}
+              style={{ width: "100%", backgroundColor: "#2ecc71", color: "white", border: "none", padding: "16px", borderRadius: "16px", fontWeight: "700", cursor: "pointer", fontSize: "16px" }}
+            >
+              Salvar Alimento e Calcular Score
+            </button>
+          </div>
+        )}
+
       </section>
 
       {/* --- BENEFÍCIOS --- */}
@@ -168,10 +304,11 @@ export default function Home() {
   }}>
     {foods.map((f, i) => (
   <Link 
-    to={`/produto/${encodeURIComponent(f.nome)}`} 
-    key={i} 
-    style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
-  >
+  to={`/produto/${encodeURIComponent(f.nome)}`} 
+  state={{ food: f }} // 👈 Isso envia o objeto do produto para a próxima página
+  key={i} 
+  style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+>
     <div 
       style={{ 
         backgroundColor: "white", 
