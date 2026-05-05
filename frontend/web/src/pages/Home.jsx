@@ -300,137 +300,174 @@ const cadastrarProdutoManual = async () => {
       )}
 
       {/* --- GRID DE RESULTADOS --- */}
-<section style={{ padding: "0 5% 100px", boxSizing: "border-box" }}>
+      <section style={{ padding: "0 5% 100px", boxSizing: "border-box" }}>
   <div style={{ 
     display: "grid", 
     gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", 
-    gap: "32px" 
+    gap: "40px" 
   }}>
     {foods.map((f, i) => (
-  <Link 
-  to={`/produto/${encodeURIComponent(f.nome)}`} 
-  state={{ food: f }} // 👈 Isso envia o objeto do produto para a próxima página
-  key={i} 
-  style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
->
-    <div 
-      style={{ 
-        backgroundColor: "white", 
-        padding: "32px", 
-        borderRadius: "32px", 
-        boxShadow: "0 10px 30px rgba(0,0,0,0.04)", 
-        textAlign: "center", 
-        position: "relative",
-        border: "1px solid #f0f2f5",
-        transition: "all 0.3s ease",
-        cursor: "pointer",
-        display: "flex",
-        flexDirection: "column"
-      }}
-      // Efeito de "levitar" o card do produto
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-10px)";
-        e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.08)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.04)";
-      }}
-    >
-      {/* Badge Nutri-Score flutuante com sombra */}
-      <div style={{ 
-        position: "absolute", 
-        top: 20, 
-        right: 20, 
-        backgroundColor: getNutriColor(f.nutriscore), 
-        color: "white", 
-        padding: "8px 16px", 
-        borderRadius: "14px", 
-        fontWeight: "800", 
-        fontSize: "14px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        zIndex: 2
-      }}>
-        {f.nutriscore}
-      </div>
-      
-      {/* Moldura da Imagem para destacar o produto */}
-      <div style={{ 
-        height: "200px", 
-        backgroundColor: "#fbfcfd", 
-        borderRadius: "20px",
-        display: "flex", 
-        alignItems: "center", 
-        justifyContent: "center", 
-        marginBottom: "24px",
-        padding: "15px",
-        overflow: "hidden"
-      }}>
-        <img 
-          src={f.imagem || "https://via.placeholder.com/150?text=Sem+Foto"} 
-          alt={f.nome} 
-          style={{ 
-            maxHeight: "100%", 
-            maxWidth: "100%", 
-            objectFit: "contain",
-            filter: "drop-shadow(0 5px 15px rgba(0,0,0,0.08))" 
-          }} 
-        />
-      </div>
-
-      {/* Informações do Texto */}
-      <div style={{ flexGrow: 1 }}>
-        <h3 style={{ 
-          fontSize: "20px", 
-          color: "#1a2a3a", 
-          fontWeight: "700", 
-          margin: "0 0 8px", 
-          minHeight: "48px", 
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden"
-        }}>
-          {f.nome}
-        </h3>
-        <p style={{ 
-          color: "#95a5a6", 
-          fontSize: "15px", 
-          fontWeight: "500", 
-          marginBottom: "24px" 
-        }}>
-          {f.marca}
-        </p>
-      </div>
-      
-      {/* Mudamos de <button> para <div> para o link funcionar corretamente */}
-      <div 
-        style={{ 
-          width: "100%", 
-          padding: "16px", 
-          borderRadius: "18px", 
-          border: "2px solid #2ecc71", 
-          backgroundColor: "transparent", 
-          color: "#2ecc71", 
-          fontWeight: "700", 
-          fontSize: "15px",
-          textAlign: "center",
-          transition: "all 0.2s ease" 
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = "#2ecc71";
-          e.target.style.color = "white";
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = "transparent";
-          e.target.style.color = "#2ecc71";
-        }}
+      <Link 
+        to={`/produto/${encodeURIComponent(f.nome)}`} 
+        state={{ food: f }} 
+        key={i} 
+        style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
       >
-        Visualizar Detalhes
-      </div>
-    </div>
-  </Link>
-))}
+        <div 
+          style={{ 
+            backgroundColor: "white", 
+            borderRadius: "32px", 
+            boxShadow: "0 10px 40px rgba(0,0,0,0.03)", 
+            textAlign: "center", // Centraliza todo o texto do card
+            position: "relative",
+            border: "1px solid #f1f5f9",
+            transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            cursor: "pointer",
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            overflow: "hidden"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-12px) scale(1.02)";
+            e.currentTarget.style.boxShadow = "0 20px 60px rgba(39, 174, 96, 0.1)";
+            e.currentTarget.style.borderColor = "#2ecc71";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0) scale(1)";
+            e.currentTarget.style.boxShadow = "0 10px 40px rgba(0,0,0,0.03)";
+            e.currentTarget.style.borderColor = "#f1f5f9";
+          }}
+        >
+          {/* Badge de Origem */}
+          <div style={{
+            position: "absolute",
+            top: "20px",
+            left: "20px",
+            backgroundColor: f.origem === "local" ? "#e0f2fe" : "#f1f5f9",
+            color: f.origem === "local" ? "#0369a1" : "#64748b",
+            padding: "4px 12px",
+            borderRadius: "20px",
+            fontSize: "10px",
+            fontWeight: "700",
+            textTransform: "uppercase",
+            zIndex: 2
+          }}>
+            {f.origem === "local" ? "✓ Seu Banco" : "API Global"}
+          </div>
+
+          {/* Badge Nutri-Score */}
+          <div style={{ 
+            position: "absolute", 
+            top: "16px", 
+            right: "16px", 
+            backgroundColor: getNutriColor(f.nutriscore), 
+            color: "white", 
+            padding: "10px 18px", 
+            borderRadius: "18px", 
+            fontWeight: "900", 
+            fontSize: "16px",
+            boxShadow: `0 8px 20px ${getNutriColor(f.nutriscore)}44`,
+            zIndex: 2,
+            border: "3px solid white"
+          }}>
+            {f.nutriscore}
+          </div>
+          
+          {/* Área da Imagem */}
+          <div style={{ 
+            height: "240px", 
+            background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)", 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            padding: "30px",
+            position: "relative"
+          }}>
+            <img 
+              src={f.imagem || "https://via.placeholder.com/200x200?text=Sem+Foto"} 
+              alt={f.nome} 
+              style={{ 
+                maxHeight: "100%", 
+                maxWidth: "100%", 
+                objectFit: "contain",
+                filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.08))"
+              }} 
+            />
+          </div>
+
+          {/* Informações de Texto */}
+          <div style={{ padding: "0 28px 28px 28px", flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <p style={{ 
+              color: "#10b981", 
+              fontSize: "12px", 
+              fontWeight: "700", 
+              textTransform: "uppercase", 
+              marginBottom: "8px",
+              letterSpacing: "1px"
+            }}>
+              {f.marca || "Marca Própria"}
+            </p>
+            
+            <h3 style={{ 
+              fontSize: "18px", 
+              color: "#1a2a3a", // Mudado de azul para um cinza bem escuro neutro
+              fontWeight: "700", 
+              margin: "0 0 12px", 
+              lineHeight: "1.4",
+              minHeight: "50px", 
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textAlign: "center"
+            }}>
+              {f.nome}
+            </h3>
+
+            {/* Tags de destaque */}
+            <div style={{ display: "flex", gap: "8px", marginBottom: "20px", justifyContent: "center" }}>
+               <span style={{ fontSize: "11px", backgroundColor: "#f8fafc", padding: "4px 10px", borderRadius: "8px", color: "#64748b", border: "1px solid #e2e8f0" }}>
+                 {f.tabela?.energia ? `${f.tabela.energia} kcal` : "Info IA"}
+               </span>
+               <span style={{ fontSize: "11px", backgroundColor: "#f8fafc", padding: "4px 10px", borderRadius: "8px", color: "#64748b", border: "1px solid #e2e8f0" }}>
+                 {f.ingredientes?.length > 50 ? "Rótulo Complexo" : "Rótulo Simples"}
+               </span>
+            </div>
+            
+            {/* Botão Analisar - AGORA VERDE E CENTRALIZADO */}
+            <div 
+              style={{ 
+                marginTop: "auto",
+                width: "100%", 
+                padding: "16px", 
+                borderRadius: "16px", 
+                backgroundColor: "#2ecc71", // Mudado de azul para verde
+                color: "white", 
+                fontWeight: "700", 
+                fontSize: "14px",
+                textAlign: "center",
+                transition: "all 0.3s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                boxShadow: "0 4px 12px rgba(46, 204, 113, 0.2)"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#27ae60";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#2ecc71";
+              }}
+            >
+              Analisar Produto
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+          </div>
+        </div>
+      </Link>
+    ))}
   </div>
 </section>
     </main>

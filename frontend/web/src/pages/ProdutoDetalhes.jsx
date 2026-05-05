@@ -76,15 +76,43 @@ export default function ProdutoDetalhes() {
     <main style={{ background: "#fdfdfd", minHeight: "100vh", padding: "40px 5%", fontFamily: "sans-serif" }}>
       
       {/* BOTÃO VOLTAR */}
-      <button 
-        onClick={() => navigate(-1)} 
-        style={{ 
-          display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none",
-          color: "#27ae60", fontWeight: "bold", marginBottom: "40px", cursor: "pointer", fontSize: "16px" 
-        }}
-      >
-        <ArrowLeft size={20} /> Voltar para os resultados
-      </button>
+      {/* --- BOTÃO VOLTAR PREMIUM --- */}
+<button 
+  onClick={() => navigate(-1)} 
+  style={{ 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px", 
+    background: "white", 
+    border: "1px solid #e2e8f0",
+    color: "#475569", // Um cinza azulado elegante
+    padding: "10px 20px",
+    borderRadius: "15px",
+    fontWeight: "700", 
+    marginBottom: "40px", 
+    cursor: "pointer", 
+    fontSize: "14px",
+    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    outline: "none"
+  }}
+  // Efeito de movimento para a esquerda ao passar o mouse
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = "#f8fafc";
+    e.currentTarget.style.transform = "translateX(-5px)";
+    e.currentTarget.style.color = "#27ae60"; // Muda para verde no hover
+    e.currentTarget.style.borderColor = "#27ae60";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = "white";
+    e.currentTarget.style.transform = "translateX(0)";
+    e.currentTarget.style.color = "#475569";
+    e.currentTarget.style.borderColor = "#e2e8f0";
+  }}
+>
+  <ArrowLeft size={18} strokeWidth={2.5} /> 
+  <span>Voltar para os resultados</span>
+</button>
 
       <section style={{ maxWidth: "1100px", margin: "0 auto" }}>
         <div style={{ display: "flex", gap: "60px", flexWrap: "wrap" }}>
@@ -169,44 +197,178 @@ export default function ProdutoDetalhes() {
   </div>
 )}
 
-                  {/* Seção Veredito */}
-                  <div style={{ backgroundColor: "#f0fdf4", padding: "15px", borderRadius: "15px", border: "1px solid #dcfce7" }}>
-                    <h4 style={{ color: "#166534", margin: "0 0 5px", display: "flex", alignItems: "center", gap: "5px" }}>
-                      <CheckCircle size={18}/> Veredito
-                    </h4>
-                    <p style={{ fontSize: "14px", color: "#166534", fontWeight: "600", margin: 0 }}>{analiseIA.veredito}</p>
-                    <p style={{ fontSize: "12px", color: "#166534", marginTop: "8px", fontStyle: "italic" }}>
-                      <strong>Sugestão:</strong> {analiseIA.sugestao}
-                    </p>
-                  </div>
+                  {/* --- SEÇÃO DE VEREDITO PREMIUM --- */}
+<div style={{ 
+  // O fundo muda para um tom avermelhado se a IA detectar que é ultraprocessado
+  backgroundColor: analiseIA.veredito.toLowerCase().includes('ultra') ? "#fef2f2" : "#f0fdf4", 
+  padding: "25px", 
+  borderRadius: "25px", 
+  // Barra lateral grossa que dá o tom de "Relatório Técnico"
+  borderLeft: `6px solid ${analiseIA.veredito.toLowerCase().includes('ultra') ? '#ef4444' : '#2ecc71'}`,
+  boxShadow: "0 4px 15px rgba(0,0,0,0.02)",
+  transition: "all 0.3s ease"
+}}>
+  <h4 style={{ 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px", 
+    color: "#0f172a", 
+    margin: "0 0 12px 0", 
+    fontSize: "17px",
+    fontWeight: "800"
+  }}>
+    <CheckCircle size={20} color={analiseIA.veredito.toLowerCase().includes('ultra') ? '#ef4444' : '#2ecc71'} /> 
+    Veredito Final
+  </h4>
+  
+  <p style={{ 
+    fontSize: "15px", 
+    color: "#334155", 
+    margin: 0, 
+    fontWeight: "500", 
+    lineHeight: "1.6" 
+  }}>
+    {analiseIA.veredito}
+  </p>
+
+  {/* Divisor discreto para a sugestão */}
+  <div style={{ 
+    marginTop: "15px", 
+    paddingTop: "15px", 
+    borderTop: "1px dashed rgba(0,0,0,0.1)" 
+  }}>
+    <p style={{ fontSize: "14px", color: "#64748b", margin: 0 }}>
+      <strong style={{ color: "#0f172a" }}>💡 Dica do Alimentare:</strong> {analiseIA.sugestao}
+    </p>
+  </div>
+</div>
 
                 </div>
               )}
             </div>
 
-            {/* BOX DE INGREDIENTES ORIGINAIS */}
-            <div style={{ backgroundColor: "#f8f9fa", padding: "35px", borderRadius: "35px" }}>
-              <h3 style={{ display: "flex", alignItems: "center", gap: "10px", color: "#2c3e50", marginBottom: "15px" }}>
-                <List color="#3498db" size={28} /> Ingredientes no Rótulo
-              </h3>
-              <p style={{ color: "#576574", lineHeight: "1.8", fontStyle: "italic", fontSize: "14px" }}>
-                {produto.ingredientes}
-              </p>
-            </div>
+            {/* --- BOX DE INGREDIENTES ORIGINAIS PREMIUM --- */}
+<div style={{ 
+  backgroundColor: "#ffffff", 
+  padding: "35px", 
+  borderRadius: "35px", 
+  border: "1px solid #e2e8f0", 
+  boxShadow: "0 10px 30px rgba(0,0,0,0.02)",
+  marginTop: "20px"
+}}>
+  <div style={{ 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "12px", 
+    marginBottom: "20px" 
+  }}>
+    <div style={{ 
+      backgroundColor: "#eff6ff", // Azul clarinho para dados factuais
+      padding: "10px", 
+      borderRadius: "14px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#3b82f6"
+    }}>
+      <List size={22} strokeWidth={3} />
+    </div>
+    <h3 style={{ 
+      color: "#0f172a", 
+      fontSize: "18px", 
+      fontWeight: "800",
+      margin: 0,
+      letterSpacing: "-0.5px"
+    }}>
+      Ingredientes no Rótulo
+    </h3>
+  </div>
+
+  <div style={{ 
+    backgroundColor: "#f8fafc", 
+    padding: "25px", 
+    borderRadius: "20px",
+    border: "1px solid #f1f5f9"
+  }}>
+    <p style={{ 
+      color: "#475569", 
+      lineHeight: "1.8", 
+      fontSize: "14px", 
+      margin: 0,
+      fontFamily: "'Inter', sans-serif",
+      textAlign: "justify",
+      hyphens: "auto"
+    }}>
+      {produto.ingredientes}
+    </p>
+  </div>
+  
+  <div style={{ 
+    marginTop: "15px", 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "6px",
+    color: "#94a3b8",
+    fontSize: "12px" 
+  }}>
+    <Info size={14} />
+    <span>Informações extraídas da base de dados global</span>
+  </div>
+</div>
             {/* --- INÍCIO DA TABELA NUTRICIONAL --- */}
+{/* --- TABELA NUTRICIONAL PREMIUM --- */}
 <div style={{ 
   backgroundColor: "white", 
-  padding: "30px", 
+  padding: "35px", 
   borderRadius: "35px", 
-  boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+  boxShadow: "0 15px 40px rgba(0,0,0,0.04)",
   marginTop: "30px",
-  border: "1px solid #f0f0f0"
+  border: "1px solid #f1f5f9",
+  position: "relative"
 }}>
-  <h3 style={{ display: "flex", alignItems: "center", gap: "10px", color: "#2c3e50", marginBottom: "20px" }}>
-    <Info color="#3498db" size={24} /> Tabela Nutricional (por 100g)
-  </h3>
-  
-  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
+  {/* Cabeçalho da Tabela */}
+  <div style={{ 
+    display: "flex", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    marginBottom: "25px" 
+  }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <div style={{ 
+        backgroundColor: "#f0f9ff", 
+        padding: "8px", 
+        borderRadius: "10px",
+        display: "flex",
+        alignItems: "center"
+      }}>
+        <Info color="#0ea5e9" size={20} />
+      </div>
+      <h3 style={{ color: "#0f172a", fontSize: "18px", fontWeight: "800", margin: 0 }}>
+        Tabela Nutricional
+      </h3>
+    </div>
+    
+    {/* Badge de referência */}
+    <span style={{ 
+      fontSize: "11px", 
+      backgroundColor: "#f1f5f9", 
+      color: "#64748b", 
+      padding: "5px 12px", 
+      borderRadius: "20px", 
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: "0.5px"
+    }}>
+      Por 100g / ml
+    </span>
+  </div>
+
+  {/* Grid de Informações */}
+  <div style={{ 
+    display: "grid", 
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", 
+    gap: "12px" 
+  }}>
     <NutriRow label="Energia" value={`${produto.tabela?.energia || 0} kcal`} />
     <NutriRow label="Açúcares" value={`${produto.tabela?.acucares || 0} g`} />
     <NutriRow label="Gord. Saturada" value={`${produto.tabela?.gordura_sat || 0} g`} />
@@ -227,12 +389,27 @@ function NutriRow({ label, value }) {
     <div style={{ 
       display: "flex", 
       justifyContent: "space-between", 
-      padding: "10px 15px", 
-      backgroundColor: "#f8f9fa", 
-      borderRadius: "10px" 
+      alignItems: "center",
+      padding: "14px 18px", 
+      backgroundColor: "#f8fafc", // Fundo neutro ultra leve
+      borderRadius: "16px",
+      border: "1px solid #f1f5f9",
+      transition: "transform 0.2s ease"
     }}>
-      <span style={{ color: "#7f8c8d", fontSize: "14px", fontWeight: "500" }}>{label}</span>
-      <span style={{ color: "#2c3e50", fontSize: "14px", fontWeight: "700" }}>{value}</span>
+      <span style={{ 
+        color: "#64748b", 
+        fontSize: "13px", 
+        fontWeight: "600" 
+      }}>
+        {label}
+      </span>
+      <span style={{ 
+        color: "#0f172a", 
+        fontSize: "15px", 
+        fontWeight: "800" 
+      }}>
+        {value}
+      </span>
     </div>
   );
 }
