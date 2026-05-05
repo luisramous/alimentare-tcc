@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Brain, List, AlertTriangle, CheckCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, Brain, List, AlertTriangle, CheckCircle, Sparkles, Info } from "lucide-react";
 
 export default function ProdutoDetalhes() {
   const { nome } = useParams();
@@ -36,8 +36,7 @@ export default function ProdutoDetalhes() {
     }
   }, [nome, produto]);
 
-  // FUNÇÃO PARA SOLICITAR ANÁLISE AO BACKEND (GEMINI)
-  const realizarAnaliseIA = async () => {
+ const realizarAnaliseIA = async () => {
     if (!produto?.ingredientes) return;
     setLoadingIA(true);
     try {
@@ -47,15 +46,19 @@ export default function ProdutoDetalhes() {
         body: JSON.stringify({ 
           nome: produto.nome, 
           ingredientes: produto.ingredientes,
-          marca: produto.marca, // ENVIANDO A MARCA
-          imagem: produto.imagem // ENVIANDO A IMAGEM PARA SALVAR NO CACHE
+          marca: produto.marca,
+          imagem: produto.imagem,
+          tabela: produto.tabela,           // 👈 AGORA ENVIA A TABELA
+          nutriscore_atual: produto.nutriscore // 👈 AGORA ENVIA A NOTA ATUAL
         })
       });
       const data = await response.json();
       setAnaliseIA(data);
     } catch (e) {
       console.error("Erro na análise:", e);
-      alert("Erro ao conectar com a Inteligência Artificial.");
+      // Se for erro de cota, a mensagem no seu backend já vai retornar um JSON amigável, 
+      // mas este alert ajuda caso o servidor nem responda.
+      alert("🤖 A Inteligência Artificial está muito ocupada agora. Por favor, aguarde cerca de 30 a 60 segundos e tente novamente.");
     } finally {
       setLoadingIA(false);
     }
@@ -159,6 +162,13 @@ export default function ProdutoDetalhes() {
                     <p style={{ fontSize: "14px", color: "#4a5568", marginTop: "5px", lineHeight: "1.5" }}>{analiseIA.aditivos}</p>
                   </div>
 
+                  {/* Adicione isso dentro do bloco {analiseIA && (...)} */}
+{analiseIA.nutriscore_ia && (produto.nutriscore === "N/A" || produto.nutriscore === "n/a") && (
+  <div style={{ marginBottom: "15px", padding: "10px", backgroundColor: "#e8f5e9", borderRadius: "10px", border: "1px solid #c8e6c9" }}>
+    <strong style={{ color: "#2e7d32" }}>📊 Nota estimada pela IA: {analiseIA.nutriscore_ia}</strong>
+  </div>
+)}
+
                   {/* Seção Veredito */}
                   <div style={{ backgroundColor: "#f0fdf4", padding: "15px", borderRadius: "15px", border: "1px solid #dcfce7" }}>
                     <h4 style={{ color: "#166534", margin: "0 0 5px", display: "flex", alignItems: "center", gap: "5px" }}>
@@ -183,10 +193,46 @@ export default function ProdutoDetalhes() {
                 {produto.ingredientes}
               </p>
             </div>
-
+            {/* --- INÍCIO DA TABELA NUTRICIONAL --- */}
+<div style={{ 
+  backgroundColor: "white", 
+  padding: "30px", 
+  borderRadius: "35px", 
+  boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+  marginTop: "30px",
+  border: "1px solid #f0f0f0"
+}}>
+  <h3 style={{ display: "flex", alignItems: "center", gap: "10px", color: "#2c3e50", marginBottom: "20px" }}>
+    <Info color="#3498db" size={24} /> Tabela Nutricional (por 100g)
+  </h3>
+  
+  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
+    <NutriRow label="Energia" value={`${produto.tabela?.energia || 0} kcal`} />
+    <NutriRow label="Açúcares" value={`${produto.tabela?.acucares || 0} g`} />
+    <NutriRow label="Gord. Saturada" value={`${produto.tabela?.gordura_sat || 0} g`} />
+    <NutriRow label="Sódio" value={`${Math.round(produto.tabela?.sodio || 0)} mg`} />
+    <NutriRow label="Proteínas" value={`${produto.tabela?.proteinas || 0} g`} />
+    <NutriRow label="Fibras" value={`${produto.tabela?.fibras || 0} g`} />
+  </div>
+</div>
+{/* --- FIM DA TABELA NUTRICIONAL --- */}
           </div>
         </div>
       </section>
     </main>
+  );
+}
+function NutriRow({ label, value }) {
+  return (
+    <div style={{ 
+      display: "flex", 
+      justifyContent: "space-between", 
+      padding: "10px 15px", 
+      backgroundColor: "#f8f9fa", 
+      borderRadius: "10px" 
+    }}>
+      <span style={{ color: "#7f8c8d", fontSize: "14px", fontWeight: "500" }}>{label}</span>
+      <span style={{ color: "#2c3e50", fontSize: "14px", fontWeight: "700" }}>{value}</span>
+    </div>
   );
 }

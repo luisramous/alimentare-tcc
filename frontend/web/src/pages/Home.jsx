@@ -56,7 +56,7 @@ const searchFoods = async () => {
 
 const cadastrarProdutoManual = async () => {
     if (!nomeManual || !ingredientesManual) {
-      alert("Preencha o nome e os ingredientes!");
+      alert("Preencha ao menos o nome e os ingredientes!");
       return;
     }
 
@@ -67,7 +67,8 @@ const cadastrarProdutoManual = async () => {
         body: JSON.stringify({
           nome: nomeManual,
           ingredientes: ingredientesManual,
-          imagem: imagemManual, // Enviando a imagem
+          marca: "Manual",
+          imagem: imagemManual || "",
           energia_kcal: parseFloat(energiaManual) || 0,
           acucares_g: parseFloat(acucarManual) || 0,
           gordura_sat_g: parseFloat(gorduraManual) || 0,
@@ -78,16 +79,19 @@ const cadastrarProdutoManual = async () => {
       });
 
       if (response.ok) {
-        const dadosDoServidor = await response.json();
-        alert("✅ Produto salvo! Indo para a análise...");
+        const data = await response.json();
+        alert("✅ Produto cadastrado com sucesso!");
         
-        // REDIRECIONAMENTO IMEDIATO PARA A PÁGINA DO PRODUTO
+        // Redireciona para os detalhes do produto que você acabou de criar
         navigate(`/produto/${encodeURIComponent(nomeManual)}`, { 
-          state: { food: dadosDoServidor.produto_completo } 
+          state: { food: data.produto_completo } 
         });
+      } else {
+        alert("Erro no servidor ao salvar.");
       }
     } catch (error) {
-      alert("Erro ao salvar no banco.");
+      console.error("Erro:", error);
+      alert("Erro de conexão.");
     }
   };
 

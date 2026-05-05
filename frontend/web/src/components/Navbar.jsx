@@ -55,26 +55,10 @@ export default function Navbar() {
       {/* --- LINKS CENTRAIS --- */}
       <div style={{ display: "flex", gap: "35px" }}>
         <NavLink to="/sobre">Como Funciona</NavLink>
-        <NavLink to="#">Planos</NavLink>
-        <NavLink to="#">Contato</NavLink>
       </div>
 
       {/* --- BOTÕES DE AÇÃO --- */}
       <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-        <button style={{ 
-          background: "none", 
-          border: "none", 
-          color: "#2c3e50", 
-          cursor: "pointer", 
-          fontWeight: "600",
-          fontSize: "15px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          transition: "0.2s"
-        }}>
-          <LogIn size={18} /> Entrar
-        </button>
 
         <button style={{ 
           backgroundColor: "#2ecc71", 
