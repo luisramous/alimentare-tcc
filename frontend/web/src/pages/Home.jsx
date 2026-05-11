@@ -203,7 +203,7 @@ const cadastrarProdutoManual = async () => {
             gap: "8px", 
             fontWeight: "600", 
             cursor: "pointer",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.03)",
+            boxShadow: "0 4px 10px rgba(173, 42, 42, 0.03)",
             transition: "0.2s"
           }}
         >
